@@ -1,0 +1,131 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-app
+
+  Sample SAM Template for sam-app
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 60
+
+    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    LoggingConfig:
+      LogFormat: JSON
+Resources:
+  DependenciesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: DependenciesLayer
+      ContentUri: dependencies/
+      CompatibleRuntimes:
+        - python3.10
+      RetentionPolicy: Retain
+
+  getFilmDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda_functions/
+      Handler: films.lambda_handler
+      Runtime: python3.10
+      Environment:
+        Variables:
+          API_URL: "https://swapi.dev/api/"
+      Architectures:
+      - x86_64
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        getFilmData:
+          Type: Api
+          Properties:
+            Path: /film
+            Method: get
+  
+  processCharactersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda_functions/
+      Handler: process_characters.lambda_handler
+      Runtime: python3.10
+      Environment:
+        Variables:
+          API_URL: "https://swapi.dev/api/"
+      Architectures:
+      - x86_64
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        processCharacters:
+          Type: Api
+          Properties:
+            Path: /characters
+            Method: get
+
+  selectPlanetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda_functions/
+      Handler: select_planet.lambda_handler
+      Runtime: python3.10
+      Environment:
+        Variables:
+          API_URL: "https://swapi.dev/api/"
+      Architectures:
+      - x86_64
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        selectPlanet:
+          Type: Api
+          Properties:
+            Path: /planet
+            Method: get
+  
+  generateCodeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda_functions/
+      Handler: generate_code.lambda_handler
+      Runtime: python3.10
+      Environment:
+        Variables:
+          API_URL: "https://swapi.dev/api/"
+      Architectures:
+      - x86_64
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        generateCode:
+          Type: Api
+          Properties:
+            Path: /code
+            Method: get
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  HelloWorldApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  HelloWorldFunction:
+    Description: Hello World Lambda Function ARN
+    Value: !GetAtt HelloWorldFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value: !GetAtt HelloWorldFunctionRole.Arn
