@@ -8,7 +8,7 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 60
+    Timeout: 120
 
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
@@ -113,6 +113,32 @@ Resources:
             Path: /workflow
             Method: get
 
+  StateMachineTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda_functions/
+      Handler: state_machine_trigger.lambda_handler
+      Runtime: python3.10
+      Policies: 
+        - Statement:
+            - Effect: Allow
+              Action:
+                - states:StartExecution
+                - states:DescribeExecution
+                - states:GetExecutionHistory
+              Resource: "arn:aws:states:us-east-1:209274816475:execution:SWStateMachine:*"
+      Environment:
+        Variables:
+          API_URL: "https://swapi.dev/api/"
+          WORKFLOW_URL: "https://sv542w6qga.execute-api.us-east-1.amazonaws.com/Prod/workflow/"
+      Architectures:
+      - x86_64
+      Events:
+        generateCode:
+          Type: Api
+          Properties:
+            Path: /trigger
+            Method: get
   
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
@@ -133,10 +159,4 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   SWApi:
     Description: API Gateway endpoint URL 
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/api/"
-  # HelloWorldFunction:
-  #   Description: Hello World Lambda Function ARN
-  #   Value: !GetAtt HelloWorldFunction.Arn
-  # HelloWorldFunctionIamRole:
-  #   Description: Implicit IAM Role created for Hello World function
-  #   Value: !GetAtt HelloWorldFunctionRole.Arn
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

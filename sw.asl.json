@@ -1,5 +1,5 @@
 {
-    "Comment": "A description of my state machine",
+    "Comment": "Star Wars State Machine",
     "StartAt": "getFilmData",
     "States": {
       "getFilmData": {
