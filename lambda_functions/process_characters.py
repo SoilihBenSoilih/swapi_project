@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 
 def lambda_handler(event, context):
-    film = event.get("film")
+    film = json.loads(event.get("body"))
     characters = film.get("characters", [])
     characters_count = len(characters)
     

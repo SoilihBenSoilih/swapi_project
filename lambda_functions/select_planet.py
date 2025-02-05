@@ -4,7 +4,7 @@ from swapi import get_many_items
 
 
 def lambda_handler(event, context):
-    film = event.get("film")
+    film = json.loads(event.get("body"))
     
     planets = get_many_items('planets')
 

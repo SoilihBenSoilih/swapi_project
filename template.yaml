@@ -14,14 +14,6 @@ Globals:
     LoggingConfig:
       LogFormat: JSON
 Resources:
-  DependenciesLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: DependenciesLayer
-      ContentUri: dependencies/
-      CompatibleRuntimes:
-        - python3.10
-      RetentionPolicy: Retain
 
   getFilmDataFunction:
     Type: AWS::Serverless::Function
@@ -34,8 +26,6 @@ Resources:
           API_URL: "https://swapi.dev/api/"
       Architectures:
       - x86_64
-      Layers:
-        - !Ref DependenciesLayer
       Events:
         getFilmData:
           Type: Api
@@ -54,8 +44,6 @@ Resources:
           API_URL: "https://swapi.dev/api/"
       Architectures:
       - x86_64
-      Layers:
-        - !Ref DependenciesLayer
       Events:
         processCharacters:
           Type: Api
@@ -74,8 +62,6 @@ Resources:
           API_URL: "https://swapi.dev/api/"
       Architectures:
       - x86_64
-      Layers:
-        - !Ref DependenciesLayer
       Events:
         selectPlanet:
           Type: Api
@@ -94,8 +80,6 @@ Resources:
           API_URL: "https://swapi.dev/api/"
       Architectures:
       - x86_64
-      Layers:
-        - !Ref DependenciesLayer
       Events:
         generateCode:
           Type: Api
@@ -103,6 +87,33 @@ Resources:
             Path: /code
             Method: get
 
+  SWStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: SWStateMachine
+      DefinitionUri: sw.asl.json
+      DefinitionSubstitutions:
+        getFilmDataFunctionArn: !GetAtt getFilmDataFunction.Arn
+        processCharactersFunctionArn: !GetAtt processCharactersFunction.Arn
+        selectPlanetFunctionArn: !GetAtt selectPlanetFunction.Arn
+        generateCodeFunctionArn: !GetAtt generateCodeFunction.Arn
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref getFilmDataFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref processCharactersFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref selectPlanetFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref generateCodeFunction
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /workflow
+            Method: get
+
+  
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -120,12 +131,12 @@ Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  SWApi:
+    Description: API Gateway endpoint URL 
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/api/"
+  # HelloWorldFunction:
+  #   Description: Hello World Lambda Function ARN
+  #   Value: !GetAtt HelloWorldFunction.Arn
+  # HelloWorldFunctionIamRole:
+  #   Description: Implicit IAM Role created for Hello World function
+  #   Value: !GetAtt HelloWorldFunctionRole.Arn

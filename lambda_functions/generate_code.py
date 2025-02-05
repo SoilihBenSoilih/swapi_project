@@ -7,7 +7,7 @@ def map_number_to_letter(num):
 
 
 def lambda_handler(event, context):
-    film = event.get("film")
+    film = json.loads(event.get("body"))
     
     secret_code = ""
 
