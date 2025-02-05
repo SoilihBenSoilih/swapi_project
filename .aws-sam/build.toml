@@ -7,6 +7,6 @@ architecture = "x86_64"
 handler = "films.lambda_handler"
 manifest_hash = "c6636c1e6b579e8de05157a7764d683c"
 packagetype = "Zip"
-functions = ["getFilmDataFunction", "processCharactersFunction", "selectPlanetFunction", "generateCodeFunction"]
+functions = ["getFilmDataFunction", "processCharactersFunction", "selectPlanetFunction", "generateCodeFunction", "StateMachineTrigger"]
 
 [layer_build_definitions]

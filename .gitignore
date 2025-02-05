@@ -3,6 +3,8 @@
 *.py[cod]
 *$py.class
 
+.aws-sam/
+
 # C extensions
 *.so
 
@@ -25,6 +27,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.ipynb
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
