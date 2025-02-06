@@ -28,7 +28,7 @@ def lambda_handler(event, context):
     # compute second letter
     selected_planet = film["selected_planet"]
     residents_count = len(selected_planet["residents"]) % 10
-    secret_code += number_to_letter(residents_count)
+    secret_code += str(residents_count)
 
     # get last letter
     secret_code += selected_planet["name"][0].upper()
