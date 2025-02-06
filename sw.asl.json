@@ -5,6 +5,7 @@
       "getFilmData": {
         "Type": "Task",
         "Resource": "${getFilmDataFunctionArn}",
+        "TimeoutSeconds": 120,
         "Retry": [
           {
             "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
@@ -18,6 +19,7 @@
       "processCharacter": {
         "Type": "Task",
         "Resource": "${processCharactersFunctionArn}",
+        "TimeoutSeconds": 120,
         "Retry": [
           {
             "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
@@ -31,6 +33,7 @@
       "selectPlanet": {
         "Type": "Task",
         "Resource": "${selectPlanetFunctionArn}",
+        "TimeoutSeconds": 120,
         "Retry": [
           {
             "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
@@ -44,6 +47,7 @@
       "generateCode": {
         "Type": "Task",
         "Resource": "${generateCodeFunctionArn}",
+        "TimeoutSeconds": 120,
         "Retry": [
           {
             "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
